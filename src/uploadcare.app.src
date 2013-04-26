@@ -1,0 +1,13 @@
+{application, uploadcare, [
+	{description, "API wrapper for uploadcare.com"},
+	{vsn, "1"},
+	{registered, []},
+	{applications, [
+		kernel,
+		stdlib,
+		inets,
+		ssl
+	]},
+	{mod, {uploadcare, []}},
+	{env, []}
+]}.
