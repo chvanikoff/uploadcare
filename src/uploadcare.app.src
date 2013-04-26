@@ -1,5 +1,5 @@
 {application, uploadcare, [
-	{description, "API wrapper for uploadcare.com"},
+	{description, "API client for uploadcare.com"},
 	{vsn, "1"},
 	{registered, []},
 	{applications, [
