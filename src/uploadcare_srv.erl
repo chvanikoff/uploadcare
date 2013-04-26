@@ -79,8 +79,8 @@ code_change(_OldVsn, State, _Extra) ->
 %% ===================================================================
 
 get_headers(Auth_data) ->
-	Public_key = proplists:get_value(public_key, Auth_data),
-	Private_key = proplists:get_value(private_key, Auth_data),
+	Public_key = proplists:get_value(public_key, Auth_data, "no_pub"),
+	Private_key = proplists:get_value(private_key, Auth_data, "no_priv"),
 	[
 		{"Authorization", "Uploadcare.Simple " ++ Public_key ++ ":" ++ Private_key},
 		{"User-Agent", "Erlang uploadcare module"},
