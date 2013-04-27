@@ -1,4 +1,5 @@
 -module(uploadcare_api).
+-author('chvanikoff <chvanikoff@gmail.com>').
 
 %% API
 -export([
