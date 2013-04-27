@@ -47,13 +47,13 @@ stop() ->
 	application:stop(uploadcare).
 
 store(UUID) ->
-	gen_server:call(?SERVER, {store, UUID}).
+	uploadcare_api:store(UUID).
 
 info(UUID) ->
-	gen_server:call(?SERVER, {info, UUID}).
+	uploadcare_api:info(UUID).
 
 delete(UUID) ->
-	gen_server:call(?SERVER, {delete, UUID}).
+	uploadcare_api:delete(UUID).
 
 %% ===================================================================
 %% Application callbacks

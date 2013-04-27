@@ -16,14 +16,11 @@
 %% API
 -export([
 	start_link/0,
-	set_auth_data/1
+	set_auth_data/1,
+	get_headers/0
 ]).
 
 -record(state, {headers = []}).
-
--define(TIMEOUT, 1000 * 30).
--define(CONNECT_TIMEOUT, 1000 * 15).
--define(FILE_URL(UUID), "https://api.uploadcare.com/files/" ++ UUID ++ "/").
 
 %% ===================================================================
 %% API functions
@@ -35,6 +32,9 @@ start_link() ->
 set_auth_data(Data) ->
 	gen_server:cast(?MODULE, {set_auth_data, Data}).
 
+get_headers() ->
+	gen_server:call(?MODULE, headers).
+
 %% ===================================================================
 %% Gen_server callbacks
 %% ===================================================================
@@ -43,21 +43,23 @@ init([]) ->
 	{ok, #state{}}.
 
 
-handle_call({store, UUID}, _From, #state{headers = Headers} = State) ->
-	{reply, fun() -> request(put, ?FILE_URL(UUID) ++ "storage/", Headers) end, State};
-
-handle_call({info, UUID}, _From, #state{headers = Headers} = State) ->
-	{reply, fun() -> request(get, ?FILE_URL(UUID), Headers) end, State};
-
-handle_call({delete, UUID}, _From, #state{headers = Headers} = State) ->
-	{reply, fun() -> request(delete, ?FILE_URL(UUID), Headers) end, State};
+handle_call(headers, _From, #state{headers = Headers} = State) ->
+	{reply, Headers, State};
 
 handle_call(_Request, _From, State) ->
 	{reply, ignored, State}.
 
 
 handle_cast({set_auth_data, Data}, State) ->
-	{noreply, State#state{headers = get_headers(Data)}};
+	Pub = proplists:get_value(public_key, Data, "no_pub"),
+	Priv = proplists:get_value(private_key, Data, "no_priv"),
+	Headers = [
+		{"Authorization", "Uploadcare.Simple " ++ Pub ++ ":" ++ Priv},
+		{"User-Agent", "Erlang uploadcare module"},
+		{"Date", date:format("Y-m-d H:i:s")},
+		{"Accept", "application/vnd.uploadcare-v0.2+json"}
+	],
+	{noreply, State#state{headers = Headers}};
 
 handle_cast(_Msg, State) ->
 	{noreply, State}.
@@ -73,29 +75,3 @@ terminate(_Reason, _State) ->
 
 code_change(_OldVsn, State, _Extra) ->
 	{ok, State}.
-
-%% ===================================================================
-%% Internal functions
-%% ===================================================================
-
-get_headers(Auth_data) ->
-	Public_key = proplists:get_value(public_key, Auth_data, "no_pub"),
-	Private_key = proplists:get_value(private_key, Auth_data, "no_priv"),
-	[
-		{"Authorization", "Uploadcare.Simple " ++ Public_key ++ ":" ++ Private_key},
-		{"User-Agent", "Erlang uploadcare module"},
-		{"Date", date:format("Y-m-d H:i:s")},
-		{"Accept", "application/vnd.uploadcare-v0.2+json"}
-	].
-
-request(put, Path, Headers) ->
-	{ok, {_, _, Response}} = httpc:request(put,
-		{Path, Headers, "application/json", ""},
-		[{timeout, ?TIMEOUT}, {connect_timeout, ?CONNECT_TIMEOUT}], []),
-	Response;
-
-request(Method, Path, Headers) ->
-	{ok, {_, _, Response}} = httpc:request(Method,
-		{Path, Headers},
-		[{timeout, ?TIMEOUT}, {connect_timeout, ?CONNECT_TIMEOUT}], []),
-	Response.
