@@ -44,7 +44,7 @@ set_auth_data(Data) ->
 	gen_server:cast(?SERVER, {set_auth_data, Data}).
 
 stop() ->
-	application:stop(tp).
+	application:stop(uploadcare).
 
 store(UUID) ->
 	gen_server:call(?SERVER, {store, UUID}).
