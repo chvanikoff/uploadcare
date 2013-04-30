@@ -29,5 +29,5 @@ uploadcare:set_auth_data(Auth_data).
 UUID = "some-uuid-that-you've-got-from-post-data-for-example",
 File_data = uploadcare:info(UUID), %% Just get a JSON data for the file
 File_data2 = uploadcare:store(UUID), %% Store the file
-File_data3 = uploadcare:delete(UUID), %% Delete the file
+File_data3 = uploadcare:delete(UUID). %% Delete the file
 ```
