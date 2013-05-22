@@ -3,6 +3,14 @@
 
 -behaviour(gen_server).
 
+%% API
+-export([
+	start_link/0,
+	set_auth_data/1,
+	get_headers/0,
+	get_pubkey/0
+]).
+
 %% Gen_server callbacks
 -export([
 	init/1,
@@ -13,14 +21,10 @@
 	code_change/3
 ]).
 
-%% API
--export([
-	start_link/0,
-	set_auth_data/1,
-	get_headers/0
-]).
-
--record(state, {headers = []}).
+-record(state, {
+	headers = [],
+	pubkey = ""
+}).
 
 %% ===================================================================
 %% API functions
@@ -35,6 +39,9 @@ set_auth_data(Data) ->
 get_headers() ->
 	gen_server:call(?MODULE, headers).
 
+get_pubkey() ->
+	gen_server:call(?MODULE, pubkey).
+
 %% ===================================================================
 %% Gen_server callbacks
 %% ===================================================================
@@ -45,6 +52,9 @@ init([]) ->
 
 handle_call(headers, _From, #state{headers = Headers} = State) ->
 	{reply, Headers, State};
+
+handle_call(pubkey, _From, #state{pubkey = Pubkey} = State) ->
+	{reply, Pubkey, State};
 
 handle_call(_Request, _From, State) ->
 	{reply, ignored, State}.
@@ -59,7 +69,7 @@ handle_cast({set_auth_data, Data}, State) ->
 		{"Date", date:format("Y-m-d H:i:s")},
 		{"Accept", "application/vnd.uploadcare-v0.2+json"}
 	],
-	{noreply, State#state{headers = Headers}};
+	{noreply, State#state{headers = Headers, pubkey = Pub}};
 
 handle_cast(_Msg, State) ->
 	{noreply, State}.

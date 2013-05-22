@@ -8,7 +8,9 @@
 	set_auth_data/1,
 	store/1,
 	info/1,
-	delete/1
+	delete/1,
+	upload_url/1,
+	upload_status/1
 ]).
 
 %% Application behaviour
@@ -54,6 +56,12 @@ info(UUID) ->
 
 delete(UUID) ->
 	uploadcare_api:delete(UUID).
+
+upload_url(URL) ->
+	uploadcare_upload:upload_url(URL).
+
+upload_status(Token) ->
+	uploadcare_upload:status(Token).
 
 %% ===================================================================
 %% Application callbacks
