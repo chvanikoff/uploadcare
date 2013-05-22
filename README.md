@@ -33,6 +33,7 @@ File_data3 = uploadcare:delete(UUID). %% Delete the file
 ```
 
 - File uploading could be implemented in 2 steps:
+
 ```erlang
 %% Send upload request and get token
 Token = uploadcare:upload_url("http://learnyousomeerlang.com/static/img/erlang-the-movie.png"),
